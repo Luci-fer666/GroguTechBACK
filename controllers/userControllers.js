@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const register = asyncHandler(async (req, res, next) => {
-    const {username, email, password, roles} = req.body;
+    const {username, usericon, email, password, roles} = req.body;
 
     const existingUser = await User.findOne({ $or: [{email},{username}]});
     if (existingUser) {
@@ -16,6 +16,7 @@ const register = asyncHandler(async (req, res, next) => {
 
     const newUser = new User({
         username,
+        usericon,
         email,
         password: hashedPassword,
         roles
@@ -23,10 +24,10 @@ const register = asyncHandler(async (req, res, next) => {
 
     const savedUser = await newUser.save();
 
-    // NO pasamos la contraseña!!!
     res.status(201).json({
         _id: savedUser._id,    
         username: savedUser.username,
+        usericon: savedUser.usericon,
         email: savedUser.email,
         roles: savedUser.roles
     });
@@ -49,6 +50,7 @@ const login = asyncHandler(async (req, res) => {
         {
             id: usuario._id,
             username: usuario.username,
+            usericon: usuario.usericon,
             roles: usuario.roles //añado rol de usuario al token
         },
         process.env.JWT_SECRET,
